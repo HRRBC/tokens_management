@@ -1,0 +1,11 @@
+migrations
+venv/
+__pycache__
+tokens_app/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.log
+ENTREGA_TOKENS_05.2025.xlsx

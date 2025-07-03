@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Tokens App{% endblock %}
+
+{% block content %}
+    <div class="container" style="width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        {% if usuario.is_authenticated %}
+            <h2>Bem-vindo, {{ usuario.first_name }}!</h2>
+        {% else %}
+        <h1>Página inicial</h1>
+        {% endif %}
+        <div class="links" style="display: flex; flex-direction: column; gap: 5px;">
+            <button class="btn btn-primary" onclick="Tokens()">Clique aqui para ver a lista de tokens</button>
+            <a href="{% url 'admin' %}" class="btn btn-warning">Área administrativa</a>
+            {% if not usuario.is_authenticated %}
+                <a href="{% url 'login' %}" class="btn btn-success">Fazer login</a>
+            {% endif %}
+            {% if usuario.is_authenticated %}
+                <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
+            {% endif %}
+        </div>  
+    </div>
+
+    <script>
+        function Tokens() {
+            window.location.href = "{% url 'lista_tokens' %}";
+        }
+    </script>
+{% endblock %}
