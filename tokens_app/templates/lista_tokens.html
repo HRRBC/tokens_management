@@ -2,13 +2,27 @@
 {% load static %}
 {% block title %}Lista de Tokens - Tokens App{% endblock %}
 <style>
+    thead th,
+    tbody td {
+        text-align: left;
+    }
+
     thead th {
         position: sticky;
-        left:0;
+        left: 0;
         top: 0;
         background-color: #f8f9fa;
         z-index: 2;
+    }
+
+    td.text-center,
+    th.text-center {
         text-align: center;
+    }
+
+    td.no-wrap {
+        white-space: nowrap;
+        word-break: keep-all;
     }
 </style>
 {% block content %}
@@ -21,17 +35,10 @@
 
 <div class="container">
     <div class="head" style="margin-top: 20px; display: flex; flex-direction:row; justify-content: space-between; align-items: center;">
-        <div class="logo-container" style="
-            display: flex;
-            align-items: center;
-        ">
-            <img src="{% static 'tokens_app/images/logo.png' %}" alt="Logo Tokens" class="logo-img" style="height: 60px;
-        max-width: 100%;
-        object-fit: contain;">
+        <div class="logo-container" style="display: flex; align-items: center;">
+            <img src="{% static 'tokens_app/images/logo.png' %}" alt="Logo Tokens" class="logo-img" style="height: 60px; max-width: 100%; object-fit: contain;">
         </div>
-        <div class="head_left" style="display: flex; flex-direction: row; gap: 10px; align-items: center; ">
-            <br>
-            <!-- <h1>Lista de Tokens</h1> -->
+        <div class="head_left" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
             <a href="{% url 'home' %}" class="btn btn-secondary">Voltar</a>
             <a href="{% url 'novo_token' %}" class="btn btn-primary">Cadastrar Token</a>
             <a href="{% url 'lista_tokens' %}" name="recarregar_lista" class="btn btn-info">Atualizar lista</a>
@@ -39,118 +46,103 @@
             <a href="{% url 'logout' %}" name="logout" class="btn btn-danger">Sair</a>
         </div>
     </div>
-        <br>
-        <input type="text" id='searchInput' placeholder='Pesquisar por nome, CPF ou setor...' class="form-control">
-        <br>
-        <div style="max-height: 80vh; overflow-y: auto; border: 1px solid #dee2e6;">
-            <table class="table table-striped">
-                <thead>
-                    <tr class="titulos_tabela">
-                        <th>Serial</th>
-                        <th>Nome</th>
-                        <th>Cpf</th>
-                        <th>Função
-                            <select name="select_funcao" id="select_funcao" onchange="window.location.href='/lista_tokens/' + this.value">
-                                <option>Selecione</option>
-                                {% for funcao in funcoes %}
-                                    <option value="{{ funcao }}">{{ funcao }}</option>
-                                {% endfor %}
-                            </select>
-                        </th>
-                        <!-- <th>Setor</th> -->
-                        <!-- <th>Telefone</th> -->
-                        <th>Data de solicitação
-                            <select name="data_solicitacao" id="data_solicitacao" onchange="window.location.href='/lista_tokens_data_solicitacao/' + this.value">
-                                <option value="">Selecione</option>
-                                {% for data in data_solicitacoes %}
-                                    <option value="{{ data }}">{{ data }}</option>
-                                {% endfor %}
-                            </select>
-                        </th>
-                        <th style="text-align: center;">Data de entrega
-                            <select name="data_entrega" id="data_entrega" onchange="console.log(window.location.href='/lista_tokens_data_entrega/' + this.value)">
-                                <option value="">Selecione</option>
-                                {% for data in data_entregas %}
-                                    <option value="{{ data }}">{{ data }}</option>
-                                {% endfor %}
-                            </select>
-                        </th>
-                        <th style="text-align: center;">Criado por
-                            <select name="criador" id="criador" onchange="window.location.href='/lista_tokens_assistente_criador/' + this.value">
-                                <option value="">Selecione</option>
-                                {% for assistente in assistentes %}
-                                    <option value="{{ assistente.id }}">{{ assistente.username }}</option>
-                                {% endfor %}
-                            </select>
-                        </th>
-                        <th style="text-align: center;">Ultima modificação por
-                            <select name="ultimaModificacao" id="ultimaModificacao" onchange="window.location.href='/lista_tokens_assistente_modificador/' + this.value">
-                                <option value="">Selecione</option>
-                                {% for assistente in assistentes %}
-                                    <option value="{{ assistente.id }}">{{ assistente.username }}</option>
-                                {% endfor %}
-                            </select>
-                        </th>
-                        <th style="text-align: center;">Entregue?
-                            <select name="entregue" id="entregue" onchange="window.location.href='/lista_tokens_entregue/' + this.value">
-                                <option value="">Selecione</option>
-                                <option value="True">Sim</option>
-                                <option value="False">Não</option>
-                            </select>
-                        </th>
-                        <th style="text-align: center;">Observação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for token in tokens %}
-                        {% if token.token_ativo %}
-                            <tr>
-                                <td>
-                                    {{ token.serial }}
-                                </td>
-                                <td><a href="{% url 'atualizar_token' token.id %}" style="text-decoration: none;">{{ token }}</a></td>
-                                <td id="cpf">{{ token.cpf_responsavel }}</td>
-                                <td>{{ token.funcao_responsavel }}</td>
-                                <!-- <td>{{ token.setor_responsavel }}</td> -->
-                                <!-- <td id="telefone">{{ token.telefone_responsavel }}</td> -->
-                                <td>{{ token.data_solicitacao }}</td>
-                                <td style="text-align: center;">{{ token.data_entrega }}</td>
-                                <td style="text-align: center;">{{ token.criador}} </td>
-                                <td style="text-align: center;"> {{token.modificador}} </td>
-
-                                <td style="text-align: center;">
-                                    {% if token.token_entregue %}
-                                        <span class="badge bg-success">Sim</span>
-                                    {% else %}
-                                        <span class="badge bg-danger">Não</span>
-                                    {% endif %}
-                                </td>
-
-                                {% if token.observacao != "" %}
+    <br>
+    <input type="text" id='searchInput' placeholder='Pesquisar por nome, CPF ou setor...' class="form-control">
+    <br>
+    <div style="max-height: 80vh; overflow-y: auto; border: 1px solid #dee2e6;">
+        <table class="table table-striped">
+            <thead>
+                <tr class="titulos_tabela">
+                    <th>Serial</th>
+                    <th>Nome</th>
+                    <th>Cpf</th>
+                    <th>Função
+                        <select name="select_funcao" id="select_funcao" onchange="window.location.href='/lista_tokens/' + this.value">
+                            <option>Selecione</option>
+                            {% for funcao in funcoes %}
+                                <option value="{{ funcao }}">{{ funcao }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th>Data de solicitação
+                        <select name="data_solicitacao" id="data_solicitacao" onchange="window.location.href='/lista_tokens_data_solicitacao/' + this.value">
+                            <option value="">Selecione</option>
+                            {% for data in data_solicitacoes %}
+                                <option value="{{ data }}">{{ data }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th>Data de entrega
+                        <select name="data_entrega" id="data_entrega" onchange="window.location.href='/lista_tokens_data_entrega/' + this.value">
+                            <option value="">Selecione</option>
+                            {% for data in data_entregas %}
+                                <option value="{{ data }}">{{ data }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th>Criado por
+                        <select name="criador" id="criador" onchange="window.location.href='/lista_tokens_assistente_criador/' + this.value">
+                            <option value="">Selecione</option>
+                            {% for assistente in assistentes %}
+                                <option value="{{ assistente.id }}">{{ assistente.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th>Última modificação por
+                        <select name="ultimaModificacao" id="ultimaModificacao" onchange="window.location.href='/lista_tokens_assistente_modificador/' + this.value">
+                            <option value="">Selecione</option>
+                            {% for assistente in assistentes %}
+                                <option value="{{ assistente.id }}">{{ assistente.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th class="text-center">Entregue?</th>
+                    <th>Observação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for token in tokens %}
+                    {% if token.token_ativo %}
+                        <tr>
+                            <td>{{ token.serial }}</td>
+                            <td><a href="{% url 'atualizar_token' token.id %}" style="text-decoration: none;">{{ token }}</a></td>
+                            <td class="no-wrap">{{ token.cpf_responsavel|safe }}</td>
+                            <td>{{ token.funcao_responsavel }}</td>
+                            <td>{{ token.data_solicitacao |date:"d/m/Y"}}</td>
+                            <td>{{ token.data_entrega |date:"d/m/Y" }}</td>
+                            <td>{{ token.criador }}</td>
+                            <td>{{ token.modificador }}</td>
+                            <td class="text-center">
+                                {% if token.token_entregue %}
+                                    <span class="badge bg-success">Sim</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Não</span>
+                                {% endif %}
+                            </td>
+                            {% if token.observacao != "" %}
                                 {% if token.observacao|length > 30 %}
-                                <span id="obs" value="{{token.observacao}}" style="text-align: center;"></span>
-                                <!-- <button onclick="abrirObs()">Ver obs</button> -->
-                                <td style="text-align: center;">
-                                    <span class="text-truncate" style="max-width: 200px; display: inline-block; text-align:center;">{{ token.observacao|slice:":30" }}...</span>
-                                    <button class="btn btn-li   nk" onclick="abrirObs()" style="padding: 0; text-decoration: underline; color: blue;">Ver mais</button>
-                                </td>
+                                    <span id="obs" value="{{token.observacao}}"></span>
+                                    <td>
+                                        <span class="text-truncate" style="max-width: 200px; display: inline-block;">{{ token.observacao|slice:":30" }}...</span>
+                                        <button class="btn btn-link" onclick="abrirObs()" style="padding: 0; text-decoration: underline; color: blue;">Ver mais</button>
+                                    </td>
                                 {% else %}
-                                <td style="text-align: center;">{{token.observacao}}</td>
+                                    <td>{{ token.observacao }}</td>
                                 {% endif %}
-                                {% else %}
-                                <td style="text-align: center;"><b>Nenhuma observação</b></td>
-                                {% endif %}
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
+                            {% else %}
+                                <td><b>Nenhuma observação</b></td>
+                            {% endif %}
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-        </div>
-    <!-- aqui fecha a div head caso dê merda -->
     {% if not sucesso %}
     <span id="naoSucesso"></span>
     {% endif %}
+
     <script>
         const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', function () {
@@ -167,33 +159,26 @@
                     }
                 });
 
-                if (found) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                row.style.display = found ? '' : 'none';
             });
         });
+
         function abrirObs() {
             const obs = document.getElementById("obs").getAttribute("value");
             alert(obs);
         }
-        window.onload = ()=>{
-            const searchInput = document.getElementById('searchInput');
-            searchInput.focus();
+
+        window.onload = () => {
+            document.getElementById('searchInput').focus();
         };
     </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
-        var cpf = document.getElementById("cpf");
         $(document).ready(function () {
             $('#cpf').mask('000.000.000-00');
-        });
-        $(document).ready(function () {
             $('#telefone').mask('(00) 00000-0000');
         });
     </script>
-    {% endblock %}
+{% endblock %}
