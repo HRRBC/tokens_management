@@ -112,8 +112,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'tokens_app',
-        'USER': 'DBA',
-        'PASSWORD': 'HRBCDBA',
+        'USER': 'dba',
+        'PASSWORD': 'hrrbcdba',
         'HOST': 'localhost',
         'PORT': '5432',
     }
