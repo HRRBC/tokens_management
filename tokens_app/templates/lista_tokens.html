@@ -1,7 +1,16 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Lista de Tokens - Tokens App{% endblock %}
-
+<style>
+    thead th {
+        position: sticky;
+        left:0;
+        top: 0;
+        background-color: #f8f9fa;
+        z-index: 2;
+        text-align: center;
+    }
+</style>
 {% block content %}
 
 {% if sucesso %}
@@ -10,97 +19,19 @@
 </div>
 {% endif %}
 
-<style>
-    .container {
-        min-height: 85vh;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .head_left {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        width: 100%;
-        flex-wrap: wrap;
-    }
-
-    .logo-container {
-        display: flex;
-        align-items: center;
-    }
-
-    .head_left img.logo-img {
-        height: 60px;
-        max-width: 100%;
-        object-fit: contain;
-    }
-
-    .buttons-container {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-
-    .head_left a.btn {
-        font-size: 1rem;
-        padding: 10px 16px;
-        border-radius: 6px;
-        font-weight: 600;
-        transition: all 0.3s ease-in-out;
-        white-space: nowrap;
-        margin: 2px 0;
-    }
-
-    .head_left a.btn:hover {
-        transform: scale(1.03);
-    }
-
-    #searchInput {
-        font-size: 1rem;
-        padding: 10px;
-    }
-
-    .table-container {
-        max-height: 70vh;
-        overflow-y: auto;
-        border: 1px solid #dee2e6;
-    }
-
-    .table thead th {
-        position: sticky;
-        top: 0;
-        background-color: #f8f9fa;
-        z-index: 2;
-        text-align: center;
-    }
-
-    .table th, .table td {
-        vertical-align: middle;
-        text-align: center;
-    }
-
-    #select_funcao {
-        padding: 6px;
-        font-size: 0.95rem;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        width: 100%;
-    }
-</style>
-
 <div class="container">
-    <div class="head_left">
-        <!-- Logo à esquerda -->
-        <div class="logo-container">
-            <img src="{% static 'tokens_app/images/logo.png' %}" alt="Logo Tokens" class="logo-img">
+    <div class="head" style="margin-top: 20px; display: flex; flex-direction:row; justify-content: space-between; align-items: center;">
+        <div class="logo-container" style="
+            display: flex;
+            align-items: center;
+        ">
+            <img src="{% static 'tokens_app/images/logo.png' %}" alt="Logo Tokens" class="logo-img" style="height: 60px;
+        max-width: 100%;
+        object-fit: contain;">
         </div>
-        
-        <!-- Botões à direita -->
-        <div class="buttons-container">
+        <div class="head_left" style="display: flex; flex-direction: row; gap: 10px; align-items: center; ">
+            <br>
+            <!-- <h1>Lista de Tokens</h1> -->
             <a href="{% url 'home' %}" class="btn btn-secondary">Voltar</a>
             <a href="{% url 'novo_token' %}" class="btn btn-primary">Cadastrar Token</a>
             <a href="{% url 'lista_tokens' %}" name="recarregar_lista" class="btn btn-info">Atualizar lista</a>
@@ -108,134 +39,161 @@
             <a href="{% url 'logout' %}" name="logout" class="btn btn-danger">Sair</a>
         </div>
     </div>
+        <br>
+        <input type="text" id='searchInput' placeholder='Pesquisar por nome, CPF ou setor...' class="form-control">
+        <br>
+        <div style="max-height: 80vh; overflow-y: auto; border: 1px solid #dee2e6;">
+            <table class="table table-striped">
+                <thead>
+                    <tr class="titulos_tabela">
+                        <th>Serial</th>
+                        <th>Nome</th>
+                        <th>Cpf</th>
+                        <th>Função
+                            <select name="select_funcao" id="select_funcao" onchange="window.location.href='/lista_tokens/' + this.value">
+                                <option>Selecione</option>
+                                {% for funcao in funcoes %}
+                                    <option value="{{ funcao }}">{{ funcao }}</option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <!-- <th>Setor</th> -->
+                        <!-- <th>Telefone</th> -->
+                        <th>Data de solicitação
+                            <select name="data_solicitacao" id="data_solicitacao" onchange="window.location.href='/lista_tokens_data_solicitacao/' + this.value">
+                                <option value="">Selecione</option>
+                                {% for data in data_solicitacoes %}
+                                    <option value="{{ data }}">{{ data }}</option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <th style="text-align: center;">Data de entrega
+                            <select name="data_entrega" id="data_entrega" onchange="console.log(window.location.href='/lista_tokens_data_entrega/' + this.value)">
+                                <option value="">Selecione</option>
+                                {% for data in data_entregas %}
+                                    <option value="{{ data }}">{{ data }}</option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <th style="text-align: center;">Criado por
+                            <select name="criador" id="criador" onchange="window.location.href='/lista_tokens_assistente_criador/' + this.value">
+                                <option value="">Selecione</option>
+                                {% for assistente in assistentes %}
+                                    <option value="{{ assistente.id }}">{{ assistente.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <th style="text-align: center;">Ultima modificação por
+                            <select name="ultimaModificacao" id="ultimaModificacao" onchange="window.location.href='/lista_tokens_assistente_modificador/' + this.value">
+                                <option value="">Selecione</option>
+                                {% for assistente in assistentes %}
+                                    <option value="{{ assistente.id }}">{{ assistente.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <th style="text-align: center;">Entregue?
+                            <select name="entregue" id="entregue" onchange="window.location.href='/lista_tokens_entregue/' + this.value">
+                                <option value="">Selecione</option>
+                                <option value="True">Sim</option>
+                                <option value="False">Não</option>
+                            </select>
+                        </th>
+                        <th style="text-align: center;">Observação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for token in tokens %}
+                        {% if token.token_ativo %}
+                            <tr>
+                                <td>
+                                    {{ token.serial }}
+                                </td>
+                                <td><a href="{% url 'atualizar_token' token.id %}" style="text-decoration: none;">{{ token }}</a></td>
+                                <td id="cpf">{{ token.cpf_responsavel }}</td>
+                                <td>{{ token.funcao_responsavel }}</td>
+                                <!-- <td>{{ token.setor_responsavel }}</td> -->
+                                <!-- <td id="telefone">{{ token.telefone_responsavel }}</td> -->
+                                <td>{{ token.data_solicitacao }}</td>
+                                <td style="text-align: center;">{{ token.data_entrega }}</td>
+                                <td style="text-align: center;">{{ token.criador}} </td>
+                                <td style="text-align: center;"> {{token.modificador}} </td>
 
-    <!-- Campo de busca com botão limpar alinhado -->
-    <div class="input-group mb-3">
-        <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar por nome, CPF ou setor...">
-        <button class="btn btn-outline-secondary" type="button"
-            onclick="document.getElementById('searchInput').value=''; document.getElementById('searchInput').dispatchEvent(new Event('input'));">
-            Limpar
-        </button>
-    </div>
+                                <td style="text-align: center;">
+                                    {% if token.token_entregue %}
+                                        <span class="badge bg-success">Sim</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Não</span>
+                                    {% endif %}
+                                </td>
 
-    <div class="table-container">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Serial</th>
-                    <th>Nome</th>
-                    <th>CPF</th>
-                    <th>
-                        <select name="select_funcao" id="select_funcao" onchange="window.location.href='/lista_tokens/' + this.value">
-                            <option>Função</option>
-                            {% for funcao in funcoes %}
-                                <option value="{{ funcao }}">{{ funcao }}</option>
-                            {% endfor %}
-                        </select>
-                    </th>
-                    <th>Data de solicitação</th>
-                    <th>Data de entrega</th>
-                    <th>Criado por</th>
-                    <th>Última modificação por</th>
-                    <th>Observação</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for token in tokens %}
-                    {% if token.token_ativo %}
-                        <div id="meuModal" class="modal-custom">
-                            <div id="modal-{{ token.id }}" class="modal-content-custom">
-                                <span class="close-modal" data-modal-id="modal-{{ token.id }}">&times;</span>
-                                <h5>Observação</h5>
-                                <p>{{ token.observacao }}</p>
-                            </div>
-                        </div>
-                        <tr>
-                            <td>{{ token.serial }}</td>
-                            <td><a href="{% url 'atualizar_token' token.id %}" style="text-decoration: none;">{{ token }}</a></td>
-                            <td id="cpf">{{ token.cpf_responsavel }}</td>
-                            <td>{{ token.funcao_responsavel }}</td>
-                            <td>{{ token.data_solicitacao }}</td>
-                            <td>{{ token.data_entrega }}</td>
-                            <td>{{ token.criador }}</td>
-                            <td>{{ token.modificador }}</td>
-                            {% if token.observacao != "" %}
+                                {% if token.observacao != "" %}
                                 {% if token.observacao|length > 30 %}
-                                    <td>Entre na edição para ver a observação.</td>
+                                <span id="obs" value="{{token.observacao}}" style="text-align: center;"></span>
+                                <!-- <button onclick="abrirObs()">Ver obs</button> -->
+                                <td style="text-align: center;">
+                                    <span class="text-truncate" style="max-width: 200px; display: inline-block; text-align:center;">{{ token.observacao|slice:":30" }}...</span>
+                                    <button class="btn btn-li   nk" onclick="abrirObs()" style="padding: 0; text-decoration: underline; color: blue;">Ver mais</button>
+                                </td>
                                 {% else %}
-                                    <td>{{ token.observacao }}</td>
+                                <td style="text-align: center;">{{token.observacao}}</td>
                                 {% endif %}
-                            {% else %}
-                                <td><b>Nenhuma observação</b></td>
-                            {% endif %}
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+                                {% else %}
+                                <td style="text-align: center;"><b>Nenhuma observação</b></td>
+                                {% endif %}
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
 
-{% if not sucesso %}
-<span id="naoSucesso"></span>
-{% endif %}
+        </div>
+    <!-- aqui fecha a div head caso dê merda -->
+    {% if not sucesso %}
+    <span id="naoSucesso"></span>
+    {% endif %}
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', function () {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
 
-<script>
-    if (document.getElementById("naoSucesso")) {
-        document.body.style.marginTop = "50px";
-    }
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let found = false;
 
-    const modal = document.getElementById("meuModal");
-    var btns = document.getElementsByClassName("abrirModal");
-    const fechar = document.querySelector(".close-modal");
+                cells.forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(filter)) {
+                        found = true;
+                    }
+                });
 
-    for (btn of btns) {
-        btn.onclick = () => {
-            modal.classList.add("ativo");
-        }
-    }
-
-    fechar.onclick = () => {
-        modal.classList.remove("ativo");
-    }
-
-    window.onclick = (event) => {
-        if (event.target === modal) {
-            modal.classList.remove("ativo");
-        }
-    }
-
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', function () {
-        const filter = this.value.toLowerCase();
-        const rows = document.querySelectorAll('tbody tr');
-
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            let found = false;
-
-            cells.forEach(cell => {
-                if (cell.textContent.toLowerCase().includes(filter)) {
-                    found = true;
+                if (found) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
                 }
             });
-
-            row.style.display = found ? '' : 'none';
         });
-    });
+        function abrirObs() {
+            const obs = document.getElementById("obs").getAttribute("value");
+            alert(obs);
+        }
+        window.onload = ()=>{
+            const searchInput = document.getElementById('searchInput');
+            searchInput.focus();
+        };
+    </script>
 
-    window.onload = () => {
-        document.getElementById('searchInput').focus();
-    };
-</script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#cpf').mask('000.000.000-00');
-        $('#telefone').mask('(00) 00000-0000');
-    });
-</script>
-
-{% endblock %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        var cpf = document.getElementById("cpf");
+        $(document).ready(function () {
+            $('#cpf').mask('000.000.000-00');
+        });
+        $(document).ready(function () {
+            $('#telefone').mask('(00) 00000-0000');
+        });
+    </script>
+    {% endblock %}

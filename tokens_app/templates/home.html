@@ -11,7 +11,7 @@
         {% endif %}
         <div class="links" style="display: flex; flex-direction: column; gap: 5px;">
             <button class="btn btn-primary" onclick="Tokens()">Clique aqui para ver a lista de tokens</button>
-            <a href="{% url 'admin' %}" class="btn btn-warning">Área administrativa</a>
+            {% comment %} <a href="{% url 'admin' %}" class="btn btn-warning">Área administrativa</a> {% endcomment %}
             {% if not usuario.is_authenticated %}
                 <a href="{% url 'login' %}" class="btn btn-success">Fazer login</a>
             {% endif %}

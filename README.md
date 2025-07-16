@@ -1,1 +1,3 @@
-# tokens_management
+## Baixar as libs:
+### - django
+### - openpyxl
