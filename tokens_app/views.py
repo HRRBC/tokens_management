@@ -202,6 +202,10 @@ def novo_token(request):
     if not request.user.is_authenticated:
         return redirect('login')
     else:
+        assistentes = get_assistentes()
+        data_entregas = get_datas_entregas()
+        data_solicitacoes = get_datas_solicitacoes()
+
         if request.method == 'POST':
             nome_responsavel = request.POST.get('nome_responsavel')
             cpf_responsavel = request.POST.get('cpf_responsavel')
@@ -210,6 +214,7 @@ def novo_token(request):
             data_solicitacao = request.POST.get('data_solicitacao') or None
             data_entrega = request.POST.get('data_entrega') or None
             observacao = request.POST.get('observacao')
+            # token_entregue = request.POST.get('token_entregue') == 'on'
 
             token = Token(
                 nome_responsavel=nome_responsavel,
@@ -224,34 +229,22 @@ def novo_token(request):
                 modificador=request.user.username,
             )
             try:
-                # Verificar se já existe token com mesmo nome, cpf ou serial
-                Token.objects.get(nome_responsavel=nome_responsavel)
-                return HttpResponse("Token já cadastrado com este nome.")
-            except Token.DoesNotExist:
-                try:
-                    Token.objects.get(serial=serial)
+                logger.info(f"User {request.user.username} tentou cadastrar um novo token: {nome_responsavel}, CPF: {cpf_responsavel}, Serial: {serial}. {time.strftime('%Y-%m-%d %H:%M:%S')}")
+                if Token.objects.filter(nome_responsavel=nome_responsavel).exists():
+                    return HttpResponse("Token já cadastrado com este nome.")
+                if serial and Token.objects.filter(serial=serial).exists():
                     return HttpResponse("Token já cadastrado com este serial.")
-                except Token.DoesNotExist:
-                    try:
-                        Token.objects.get(cpf_responsavel=cpf_responsavel)
-                        return HttpResponse("Token já cadastrado com este CPF.")
-                    except Token.DoesNotExist:
-                        token.save()
-                        logger.info(f"User {request.user.username} cadastrou um novo token: {nome_responsavel}, CPF: {cpf_responsavel}, Serial: {serial}. {time.strftime('%Y-%m-%d %H:%M:%S')}")
+                if cpf_responsavel and Token.objects.filter(cpf_responsavel=cpf_responsavel).exists():
+                    return HttpResponse("Token já cadastrado com este CPF.")
+                Token.objects.get(cpf_responsavel=cpf_responsavel)
+                return HttpResponse("Token já cadastrado com este nome, CPF ou serial.")
+            except Token.MultipleObjectsReturned:
+                return HttpResponse("Erro: Múltiplos tokens encontrados com o mesmo nome, CPF ou serial. Verifique os dados.")
             
-            assistentes = get_assistentes()
-            data_entregas = get_datas_entregas()
-            data_solicitacoes = get_datas_solicitacoes()
-            return render(request, 'lista_tokens.html', {
-                'tokens': Token.objects.all(),
-                "sucesso": "Token cadastrado com sucesso!",
-                "usuario": request.user,
-                "funcoes": funcoes,
-                "assistentes": assistentes,
-                "data_entregas": data_entregas,
-                "data_solicitacoes": data_solicitacoes
-            })
-
+            except Token.DoesNotExist:
+                logger.info(f"User {request.user.username} cadastrou um novo token: {nome_responsavel}, CPF: {cpf_responsavel}, Serial: {serial}. {time.strftime('%Y-%m-%d %H:%M:%S')}")
+                token.save()
+            return render(request, 'lista_tokens.html', {'tokens': Token.objects.all(), "sucesso": "Token cadastrado com sucesso!", "usuario": request.user, "funcoes": funcoes, "assistentes": assistentes, "data_entregas": data_entregas, "data_solicitacoes": data_solicitacoes})
         logger.info(f"User {request.user.username} acessou a página de cadastro de novo token. {time.strftime('%Y-%m-%d %H:%M:%S')}")
         return render(request, 'novo_token.html', {"funcoes": funcoes, "usuario": request.user})
 
