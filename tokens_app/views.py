@@ -78,7 +78,8 @@ def lista_tokens_funcao(request, funcao):
             "funcoes": funcoes,
             "data_entregas": data_entregas,
             "data_solicitacoes": data_solicitacoes,
-            "assistentes": assistentes
+            "assistentes": assistentes,
+            "user_permissions": request.user.get_all_permissions(),
         })
 
 def lista_tokens_assistente_modificador(request, assistente_id):
@@ -98,7 +99,8 @@ def lista_tokens_assistente_modificador(request, assistente_id):
                 "funcoes": funcoes,
                 "data_entregas": data_entregas,
                 "data_solicitacoes": data_solicitacoes,
-                "assistentes": assistentes
+                "assistentes": assistentes,
+                "user_permissions": request.user.get_all_permissions(),
             })
         except User.DoesNotExist:
             return HttpResponse("Assistente não encontrado.")
@@ -170,7 +172,8 @@ def lista_tokens_data_entrega(request, data_entrega):
                 "funcoes": funcoes,
                 "data_entregas": data_entregas,
                 "data_solicitacoes": data_solicitacoes,
-                "assistentes": assistentes
+                "assistentes": assistentes,
+                "user_permissions": request.user.get_all_permissions(),
             })
         except Exception as e:
             return HttpResponse(f"Erro ao filtrar tokens por data de entrega: {str(e)}")
@@ -199,7 +202,8 @@ def lista_tokens_entregue(request, entregue):
             "funcoes": funcoes,
             "data_entregas": data_entregas,
             "data_solicitacoes": data_solicitacoes,
-            "assistentes": assistentes
+            "assistentes": assistentes,
+            "user_permissions": request.user.get_all_permissions(),
         })
 
 def novo_token(request):
@@ -248,9 +252,9 @@ def novo_token(request):
             except Token.DoesNotExist:
                 logger.info(f"User {request.user.username} cadastrou um novo token: {nome_responsavel}, CPF: {cpf_responsavel}, Serial: {serial}. {time.strftime('%Y-%m-%d %H:%M:%S')}")
                 token.save()
-            return render(request, 'lista_tokens.html', {'tokens': Token.objects.all(), "sucesso": "Token cadastrado com sucesso!", "usuario": request.user, "funcoes": funcoes, "assistentes": assistentes, "data_entregas": data_entregas, "data_solicitacoes": data_solicitacoes})
+            return render(request, 'lista_tokens.html', {'tokens': Token.objects.all(), "sucesso": "Token cadastrado com sucesso!", "usuario": request.user, "funcoes": funcoes, "assistentes": assistentes, "data_entregas": data_entregas, "data_solicitacoes": data_solicitacoes, "user_permissions": request.user.get_all_permissions(),})
         logger.info(f"User {request.user.username} acessou a página de cadastro de novo token. {time.strftime('%Y-%m-%d %H:%M:%S')}")
-        return render(request, 'novo_token.html', {"funcoes": funcoes, "usuario": request.user})
+        return render(request, 'novo_token.html', {"funcoes": funcoes, "usuario": request.user, "user_permissions": request.user.get_all_permissions(),})
 
 def atualizar_token(request, token_id):
     if not request.user.is_authenticated:
