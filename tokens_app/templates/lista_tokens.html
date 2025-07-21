@@ -40,63 +40,72 @@
         </div>
         <div class="head_left" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
             <a href="{% url 'home' %}" class="btn btn-secondary">Voltar</a>
-            <a href="{% url 'novo_token' %}" class="btn btn-primary">Cadastrar Token</a>
+            {% if 'tokens_app.add_token' in user_permissions %}
+            <a href="{% url 'novo_token' %}" class="btn btn-primary">Cadastrar Token</a>`
+            {% endif %}
             <a href="{% url 'lista_tokens' %}" name="recarregar_lista" class="btn btn-info">Atualizar lista</a>
             <a href="{% url 'exportar_planilha' %}" name="exportar_planilha" class="btn btn-success">Exportar planilha</a>
             <a href="{% url 'logout' %}" name="logout" class="btn btn-danger">Sair</a>
         </div>
     </div>
     <br>
-    <input type="text" id='searchInput' placeholder='Pesquisar por nome, CPF ou setor...' class="form-control">
+    <input type="text" id='searchInput' placeholder='Pesquisar por nome, CPF ou data de entrega...' class="form-control" style="width: 100%;">
     <br>
     <div style="max-height: 80vh; overflow-y: auto; border: 1px solid #dee2e6;">
         <table class="table table-striped">
             <thead>
                 <tr class="titulos_tabela">
-                    <th>Serial</th>
-                    <th>Nome</th>
-                    <th>Cpf</th>
-                    <th>Função
+                    <th>SERIAL</th>
+                    <th>NOME</th>
+                    <th>CPF</th>
+                    <th>
                         <select name="select_funcao" id="select_funcao" onchange="window.location.href='/lista_tokens/' + this.value">
-                            <option>Selecione</option>
+                            <option>FUNÇÃO</option>
                             {% for funcao in funcoes %}
                                 <option value="{{ funcao }}">{{ funcao }}</option>
                             {% endfor %}
                         </select>
                     </th>
-                    <th>Data de solicitação
-                        <select name="data_solicitacao" id="data_solicitacao" onchange="window.location.href='/lista_tokens_data_solicitacao/' + this.value">
-                            <option value="">Selecione</option>
+                    <th>DATA DE SOLICITAÇÃO
+                        <!-- <select name="data_solicitacao" id="data_solicitacao" onchange="window.location.href='/lista_tokens_data_solicitacao/' + this.value">
+                            <option value="">Data de solicitação</option>
                             {% for data in data_solicitacoes %}
                                 <option value="{{ data }}">{{ data }}</option>
                             {% endfor %}
-                        </select>
+                        </select> -->
                     </th>
-                    <th>Data de entrega
-                        <select name="data_entrega" id="data_entrega" onchange="window.location.href='/lista_tokens_data_entrega/' + this.value">
-                            <option value="">Selecione</option>
+                    <th>
+                        DATA DE ENTREGA
+                        <!-- <select name="data_entrega" id="data_entrega" onchange="window.location.href='/lista_tokens_data_entrega/' + this.value">
+                            <option value="">Data de entrega</option>
                             {% for data in data_entregas %}
                                 <option value="{{ data }}">{{ data }}</option>
-                            {% endfor %}
+                            {% endfor %} -->
                         </select>
                     </th>
-                    <th>Criado por
+                    <!-- <th>Criado por
                         <select name="criador" id="criador" onchange="window.location.href='/lista_tokens_assistente_criador/' + this.value">
                             <option value="">Selecione</option>
                             {% for assistente in assistentes %}
                                 <option value="{{ assistente.id }}">{{ assistente.username }}</option>
                             {% endfor %}
                         </select>
-                    </th>
-                    <th>Última modificação por
+                    </th> -->
+                    <th>
                         <select name="ultimaModificacao" id="ultimaModificacao" onchange="window.location.href='/lista_tokens_assistente_modificador/' + this.value">
-                            <option value="">Selecione</option>
+                            <option value="">ÚLTIMA MODIFICAÇÃO</option>
                             {% for assistente in assistentes %}
                                 <option value="{{ assistente.id }}">{{ assistente.username }}</option>
                             {% endfor %}
                         </select>
                     </th>
-                    <th class="text-center">Entregue?</th>
+                    <th class="text-center">
+                        <select name="token_entregue" id="token_entregue" onchange="window.location.href='/lista_tokens_entregue/' + this.value">
+                            <option value="">SITUAÇÃO</option>
+                            <option value="True">Entregue</option>
+                            <option value="False">Não entregue</option>
+                        </select>
+                    </th>
                     <th>Observação</th>
                 </tr>
             </thead>
@@ -105,12 +114,12 @@
                     {% if token.token_ativo %}
                         <tr>
                             <td>{{ token.serial }}</td>
-                            <td><a href="{% url 'atualizar_token' token.id %}" style="text-decoration: none;">{{ token }}</a></td>
-                            <td class="no-wrap">{{ token.cpf_responsavel|safe }}</td>
+                            <td style="width: 20%;"><a {% if 'tokens_app.change_token' in user_permissions %} href="{% url 'atualizar_token' token.id %}" {% endif %} style="text-decoration: none;">{{ token }}</a></td>
+                            <td class="no-wrap" style="width: 10%;">{{ token.cpf_responsavel|safe }}</td>
                             <td>{{ token.funcao_responsavel }}</td>
-                            <td>{{ token.data_solicitacao |date:"d/m/Y"}}</td>
-                            <td>{{ token.data_entrega |date:"d/m/Y" }}</td>
-                            <td>{{ token.criador }}</td>
+                            <td style="width: 15%;">{{ token.data_solicitacao |date:"d/m/Y"}}</td>
+                            <td style="width: 10%;">{{ token.data_entrega |date:"d/m/Y" }}</td>
+                            <!-- <td>{{ token.criador }}</td> -->
                             <td>{{ token.modificador }}</td>
                             <td class="text-center">
                                 {% if token.token_entregue %}
@@ -122,15 +131,20 @@
                             {% if token.observacao != "" %}
                                 {% if token.observacao|length > 30 %}
                                     <span id="obs" value="{{token.observacao}}"></span>
-                                    <td>
+                                    <td style="width: 5%;">
                                         <span class="text-truncate" style="max-width: 200px; display: inline-block;">{{ token.observacao|slice:":30" }}...</span>
                                         <button class="btn btn-link" onclick="abrirObs()" style="padding: 0; text-decoration: underline; color: blue;">Ver mais</button>
                                     </td>
                                 {% else %}
-                                    <td>{{ token.observacao }}</td>
+                                    <td style="width: 5%;">{{ token.observacao }}</td>
                                 {% endif %}
                             {% else %}
-                                <td><b>Nenhuma observação</b></td>
+                                <td style="width: 5%;"><b>Nenhuma observação</b></td>
+                            {% endif %}
+                            {% if 'tokens_app.change_token' in user_permissions %}
+                                <td>
+                                    <a href="{% url 'atualizar_token' token.id %}" class="btn btn-warning btn-sm">Editar</a>
+                                </td>
                             {% endif %}
                         </tr>
                     {% endif %}
