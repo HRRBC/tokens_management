@@ -2,94 +2,81 @@
 
 {% block title %}{{token}}{% endblock %}
 
-
 {% block content %}
-
-    {% if sucesso %}
+{% if sucesso %}
     <div class="alert alert-success" role="alert">
         {{sucesso}}
     </div>
-    {% endif %}
+{% endif %}
 
+{% if 'tokens_app.change_token' in user_permissions %}
 
-    <form action="{% url 'atualizar_token' token.id %}" method="POST" class="container mt-4"> 
-    {% csrf_token %}
+<!-- Container centralizado -->
+<div class="d-flex justify-content-center mt-5">
+    <div class="p-4 bg-white shadow rounded" style="max-width: 600px; width: 100%;">
+        <form action="{% url 'atualizar_token' token.id %}" method="POST"> 
+            {% csrf_token %}
 
-    <div class="mb-3">
-        <label for="nome_responsavel" class="form-label">Nome do responsável</label>
-        <input type="text" class="form-control" name="nome_responsavel" id="nome_responsavel" value="{{ token.nome_responsavel }}" placeholder="Nome do responsável">
+            <div class="mb-3">
+                <label for="nome_responsavel" class="form-label">Nome do responsável</label>
+                <input type="text" class="form-control" name="nome_responsavel" id="nome_responsavel" value="{{ token.nome_responsavel }}" placeholder="Nome do responsável">
+            </div>
+
+            <div class="mb-3">
+                <label for="cpf" class="form-label">CPF do responsável</label>
+                <input type="text" class="form-control" name="cpf_responsavel" id="cpf" {% if token.cpf_responsavel != None %} value="{{ token.cpf_responsavel }}" {% endif %} placeholder="000.000.000-00" maxlength="14">
+            </div>
+
+            <div class="mb-3">
+                <label for="funcao_responsavel" class="form-label">Função</label>
+                <select class="form-select" name="funcao_responsavel" id="funcao_responsavel" value="{{ token.funcao_responsavel }}">
+                    <option value="{{token.funcao_responsavel}}">{{token.funcao_responsavel}}</option>
+                    {% for funcao in funcoes %}
+                        {% if funcao != token.funcao_responsavel %}
+                            <option value="{{ funcao }}">{{ funcao }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="serial" class="form-label">Serial do token</label>
+                <input type="number" class="form-control" name="serial" id="serial" value="{{ token.serial }}" placeholder="Serial do token" maxlength="14">
+            </div>
+
+            <div class="mb-3">
+                <label for="data_solicitacao" class="form-label">Data de solicitação</label>
+                <input type="date" class="form-control" name="data_solicitacao" id="data_solicitacao" value="{{ token.data_solicitacao }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="data_entrega" class="form-label">Data de entrega</label>
+                <input type="date" class="form-control" name="data_entrega" id="data_entrega" {% if token.data_entrega != None %} value="{{ token.data_entrega }}" {% endif %}>
+                <label for="entregue" class="form-label mt-2">Entregue?</label>
+                <input type="checkbox" name="token_entregue" id="entregue" class="form-check-input ms-2" onchange="console.log(this.checked)" {% if token.token_entregue %} checked {% endif %}>
+            </div>
+
+            <div class="mb-3">
+                <label for="observacao" class="form-label">Observação</label>
+                <textarea class="form-control" name="observacao" id="observacao" rows="3" placeholder="Observação">{{ token.observacao }}</textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{% url 'lista_tokens' %}" class="btn btn-secondary">Voltar para a lista de tokens</a>
+                <button type="submit" class="btn btn-primary">Atualizar Token</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label for="cpf" class="form-label">CPF do responsável</label>
-        <input type="text" class="form-control" name="cpf_responsavel" id="cpf" {%if token.cpf_responsavel != None %} value="{{ token.cpf_responsavel }}" {% endif %} placeholder="000.000.000-00" maxlength="14">
-    </div>
-
-    <div class="mb-3">
-        <label for="funcao_responsavel" class="form-label">Função</label>
-        <select class="form-select" name="funcao_responsavel" id="funcao_responsavel" value="{{ token.funcao_responsavel }}">
-            <option value="{{token.funcao_responsavel}}">{{token.funcao_responsavel}}</option>
-            {% for funcao in funcoes %}
-                {% if funcao != token.funcao_responsavel %}
-                    <option value="{{ funcao }}">{{ funcao }}</option>
-                {% endif %}
-            {% endfor %}
-        </select>
-    </div>
-
-    <!-- <div class="mb-3">
-        <label for="setor_responsavel" class="form-label">Setor</label>
-        <select class="form-select" name="setor_responsavel" id="setor_responsavel">
-            {% for setor in setores %}
-                <option value="{{ setor }}">{{ setor }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label for="telefone" class="form-label">Telefone do responsável</label>
-        <input type="text" class="form-control" name="telefone_responsavel" id="telefone" value="{{ token.telefone_responsavel }}" placeholder="(00) 00000-0000" maxlength="15">
-    </div> -->
-
-    <div class="mb-3">
-        <label for="serial" class="form-label">Serial do token</label>
-        <input type="number" class="form-control" name="serial" id="serial" value="{{ token.serial }}" placeholder="Serial do token" maxlength="14">
-    </div>
-
-    <div class="mb-3">
-        <label for="data_solicitacao" class="form-label">Data de solicitação</label>
-        <input type="date" class="form-control" name="data_solicitacao" id="data_solicitacao" value="{{ token.data_solicitacao }}">
-    </div>
-
-    <div class="mb-3">
-        <label for="data_entrega" class="form-label">Data de entrega</label>
-        <!-- {% if token.data_entrega != None %}
-        <i id="dataEnt" value="{{token.data_entrega}}">{{token.data_entrega}}</i>
-        {% endif %} -->
-        <input type="date" class="form-control" name="data_entrega" id="data_entrega" {% if token.data_entrega != None %} value="{{ token.data_entrega }}" {% endif %}>
-        <label for="entregue">Entregue? </label>
-            <input type="checkbox" name="token_entregue" id="entregue" class="form-check-input" onchange="console.log(this.checked)" {% if token.token_entregue %} checked {% endif %}>
-        <label for=""></label>
-    </div>
-
-    <div class="mb-3">
-        <label for="observacao" class="form-label">Observação</label>
-        <textarea class="form-control" name="observacao" id="observacao" rows="3" placeholder="Observação">{{ token.observacao }}</textarea>
-    </div>
-
-    <div class="d-flex gap-2">
-        <a href="{% url 'lista_tokens' %}" class="btn btn-secondary">Voltar para a lista de tokens</a>
-        <button type="submit" class="btn btn-primary">Atualizar Token</button>
-    </div>
-</form>
-
+<!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
 {% if not sucesso %}
     <span id="naoSucesso"></span>
 {% endif %}
+
 <script>
     var cpf = document.getElementById("cpf");
 
@@ -98,31 +85,38 @@
     });
 
     var entregue = document.getElementById("entregue");
+    var data_entrega = document.getElementById("data_entrega");
 
-    var data_entrega = document.getElementById("data_entrega");  
-
-    data_entrega.innerHTML = document.getElementById("dataEnt").value;
-
-
-
-    entregue.addEventListener("change", ()=>{
-        if (entregue === true || entregue.checked) {
+    entregue.addEventListener("change", () => {
+        if (entregue.checked) {
             data_entrega.removeAttribute("disabled");
             data_entrega.setAttribute("required", "required");
-        } 
-        else {
+        } else {
             data_entrega.setAttribute("disabled", "disabled");
             data_entrega.removeAttribute("required");
             data_entrega.value = "";
         }
-    })
+    });
+
+    // Desativa data_entrega inicialmente, se não estiver entregue
+    if (!entregue.checked) {
+        data_entrega.setAttribute("disabled", "disabled");
+    }
+
     if (document.getElementById("naoSucesso")) {
         document.body.style.marginTop = "50px";
     }
-
-
-    {% comment %} $(document).ready(function () {
-        $('#telefone').mask('(00) 00000-0000');
-    }); {% endcomment %}
 </script>
+
+{% else %}
+<center>
+    <div class="alert alert-danger" role="alert">
+        Você não tem permissão para acessar esta página.
+    </div>
+    <a href="{% url 'lista_tokens' %}" class="btn btn-secondary mt-3">Voltar para a lista de tokens</a>
+
+</center>
+
+{% endif %}
+
 {% endblock %}

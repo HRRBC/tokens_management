@@ -11,6 +11,8 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
+User()
+
 # Funções auxiliares para pegar dados dinâmicos no momento da requisição
 def get_assistentes():
     return User.objects.all()
@@ -54,8 +56,10 @@ def lista_tokens(request):
             "funcoes": funcoes,
             "data_entregas": data_entregas,
             "data_solicitacoes": data_solicitacoes,
-            "assistentes": assistentes
+            "assistentes": assistentes,
+            "user_permissions": request.user.get_all_permissions(),
         })
+
 
 def lista_tokens_funcao(request, funcao):
     if not request.user.is_authenticated:
@@ -224,7 +228,7 @@ def novo_token(request):
                 data_solicitacao=data_solicitacao,
                 data_entrega=data_entrega,
                 observacao=observacao,
-                token_entregue=(request.POST.get('token_entregue') == 'on'),
+                token_entregue=((request.POST.get('token_entregue') == 'on') or (data_entrega is not None)),
                 criador=request.user.username,
                 modificador=request.user.username,
             )
@@ -380,3 +384,5 @@ def exportar_planilha(request):
 
         workbook.save(response)
         logger.info(f"Usuário {request.user.username} exportou a lista de tokens para uma planilha Excel. {time.strftime('%Y-%m-%d %H:%M:%S')}")
+
+        return response
