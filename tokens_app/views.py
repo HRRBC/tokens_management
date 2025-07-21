@@ -298,13 +298,15 @@ def atualizar_token(request, token_id):
                 "funcoes": funcoes,
                 "assistentes": assistentes,
                 "data_entregas": data_entregas,
-                "data_solicitacoes": data_solicitacoes
+                "data_solicitacoes": data_solicitacoes,
+                "user_permissions": request.user.get_all_permissions(),
             })
         return render(request, 'token.html', {
             'token': token,
             "funcoes": funcoes,
             "usuario": request.user,
-            "assistentes": get_assistentes()
+            "assistentes": get_assistentes(),
+            "user_permissions": request.user.get_all_permissions(),
         })
 
 def atualizar_lista(request):
