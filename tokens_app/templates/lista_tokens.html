@@ -41,7 +41,7 @@
         <div class="head_left" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
             <a href="{% url 'home' %}" class="btn btn-secondary">Voltar</a>
             {% if 'tokens_app.add_token' in user_permissions %}
-            <a href="{% url 'novo_token' %}" class="btn btn-primary">Cadastrar Token</a>`
+            <a href="{% url 'novo_token' %}" class="btn btn-primary">Cadastrar Token</a>
             {% endif %}
             <a href="{% url 'lista_tokens' %}" name="recarregar_lista" class="btn btn-info">Atualizar lista</a>
             <a href="{% url 'exportar_planilha' %}" name="exportar_planilha" class="btn btn-success">Exportar planilha</a>
